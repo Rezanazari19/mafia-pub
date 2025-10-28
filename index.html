@@ -49,6 +49,28 @@
     }
   </style>
 </head>
+
+  <script>
+  const storageKey = 'playerName_' + (localStorage.getItem('playerDeviceId') || (() => {
+    const id = 'device_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+    localStorage.setItem('playerDeviceId', id);
+    return id;
+  })());
+
+  window.addEventListener('message', (event) => {
+    const { type, name } = event.data;
+
+    if (type === 'saveName') {
+      localStorage.setItem(storageKey, name);
+    }
+
+    if (type === 'getName') {
+      const savedName = localStorage.getItem(storageKey);
+      event.source.postMessage({ type: 'returnName', name: savedName }, event.origin);
+    }
+  });
+</script>
+  
 <body>
 
   <div class="app-container">
