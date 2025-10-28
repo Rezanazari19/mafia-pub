@@ -1,42 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Auto Save Player Name</title>
-</head>
-<body>
-  <h1>Enter Player Name</h1>
+  <meta charset="UTF-8" />
+  <title>The Godfathers</title>
 
-  <input type="text" id="playerName" placeholder="Type your name">
-  <button id="retrieveBtn">Retrieve Name</button>
-  <p id="output"></p>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-  <script>
-    // Optional device ID to keep storage unique
-    let deviceId = localStorage.getItem('playerDeviceId');
-    if (!deviceId) {
-      deviceId = 'device_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
-      localStorage.setItem('playerDeviceId', deviceId);
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+  <!-- iOS & Android Support -->
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-icon-180.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#243a4f" />
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background-color: #243a4f;
+      overflow: hidden; /* 🔥 Prevents scrollbar */
     }
 
-    const input = document.getElementById('playerName');
-    const storageKey = 'playerName_' + deviceId;
-    const output = document.getElementById('output');
+    .app-container {
+      position: fixed;
+      top: env(safe-area-inset-top);
+      right: env(safe-area-inset-right);
+      bottom: env(safe-area-inset-bottom);
+      left: env(safe-area-inset-left);
+      background-color: #243a4f;
 
-    // Auto-save last name typed
-    input.addEventListener('input', () => {
-      localStorage.setItem(storageKey, input.value);
-    });
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
 
-    // Retrieve saved name on button click
-    document.getElementById('retrieveBtn').addEventListener('click', () => {
-      const savedName = localStorage.getItem(storageKey);
-      if (savedName) {
-        output.textContent = 'Saved Name: ' + savedName;
-        input.value = savedName; // optional: populate input
-      } else {
-        output.textContent = 'No saved name found!';
-      }
-    });
-  </script>
+    iframe {
+      width: 100%;
+      height: 95vh;
+      border: none;
+      display: block;
+      
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <iframe src="https://script.google.com/macros/s/AKfycbxy9KU46yjNWkCmmvqCq4D6LTNgkZtiYuN5ucgAxpoDm38JQSDOdlZfbemF-_mBrc5w0Q/exec"></iframe>
+  </div>
+
 </body>
 </html>
