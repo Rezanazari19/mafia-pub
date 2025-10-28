@@ -49,6 +49,43 @@
 </head>
 <body>
 
+  <script>
+  // Generate device ID once in parent
+  function getDeviceId() {
+    let deviceId = localStorage.getItem('mafiaDeviceId');
+    if (!deviceId) {
+      const fingerprint = [
+        navigator.userAgent,
+        navigator.language,
+        screen.width + 'x' + screen.height,
+        screen.colorDepth,
+        new Date().getTimezoneOffset(),
+        !!window.sessionStorage,
+        !!window.localStorage
+      ].join('|');
+
+      let hash = 0;
+      for (let i = 0; i < fingerprint.length; i++) {
+        const char = fingerprint.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+
+      deviceId = 'device_' + Math.abs(hash) + '_' + Date.now();
+      localStorage.setItem('mafiaDeviceId', deviceId);
+    }
+    return deviceId;
+  }
+
+  const iframe = document.getElementById('game-iframe');
+
+  iframe.addEventListener('load', () => {
+    const deviceId = getDeviceId();
+    iframe.contentWindow.postMessage({ type: 'DEVICE_ID', deviceId }, '*');
+  });
+</script>
+
+  
   <div class="app-container">
     <iframe id="gameFrame" src="https://script.google.com/macros/s/AKfycbwgMVf6b-sFWrugXYNcZC96vHlIFjf0KQWdd2spIRuiloMMz6feQppVoEGQ4Mg85ndT/exec?name=RezaNazari"></iframe>
   </div>
