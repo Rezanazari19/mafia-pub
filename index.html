@@ -46,17 +46,102 @@
       display: block;
     }
   </style>
+
+  <script>
+    // -------------------------------
+    // Device ID Management
+    // -------------------------------
+    function getDeviceId() {
+      let deviceId = localStorage.getItem('mafiaDeviceId');
+      if (!deviceId) {
+        deviceId = 'device_' + Math.random().toString(36).substring(2, 12);
+        localStorage.setItem('mafiaDeviceId', deviceId);
+      }
+      return deviceId;
+    }
+
+    const deviceId = getDeviceId(); // global
+
+
+    function sendDeviceIdToIframe() {
+      const iframe = document.getElementById('childFrame');
+      if (!iframe) return;
+
+      // Replace with your actual iframe origin
+      const childOrigin = 'https://your-child-domain.com';
+
+      iframe.contentWindow.postMessage({ deviceId }, childOrigin);
+    }
+
+    function saveGame(saveData) {
+      if (!saveData) return;
+
+      saveData.timestamp = Date.now();
+
+      google.script.run
+        .withSuccessHandler((response) => {
+          console.log('Game saved:', response);
+        })
+        .withFailureHandler((err) => console.error('Save failed:', err))
+        .saveGameState(saveData, deviceId);
+    }
+
+    // -------------------------------
+    // Load Game Example
+    // -------------------------------
+    function loadGame(callback) {
+      google.script.run
+        .withSuccessHandler(callback)
+        .withFailureHandler((err) => console.error('Load failed:', err))
+        .loadGameState(deviceId);
+    }
+
+    // -------------------------------
+    // Send device ID after iframe loads
+    // -------------------------------
+    window.addEventListener('load', () => {
+      const iframe = document.getElementById('childFrame');
+      if (iframe) {
+        iframe.addEventListener('load', sendDeviceIdToIframe);
+      }
+    });
+  </script>
 </head>
+<script>
+   
+    function getDeviceId() {
+      let deviceId = localStorage.getItem('mafiaDeviceId');
+      if (!deviceId) {
+        deviceId = 'device_' + Math.random().toString(36).substring(2, 12);
+        localStorage.setItem('mafiaDeviceId', deviceId);
+      }
+      return deviceId;
+    }
+
+    const deviceId = getDeviceId(); // global
+    
+    function registerDevice() {
+      google.script.run
+        .withSuccessHandler(response => {
+          console.log('Device registered:', response);
+          // After registration, you can load child iframe safely
+          loadChildIframe();
+        })
+        .withFailureHandler(err => console.error('Failed to register device:', err))
+        .getDeviceIdForChild(deviceId);
+    }
+
+    function loadChildIframe() {
+      const iframe = document.getElementById('childFrame');
+      iframe.src = 'https://https://script.google.com/macros/s/AKfycbwgMVf6b-sFWrugXYNcZC96vHlIFjf0KQWdd2spIRuiloMMz6feQppVoEGQ4Mg85ndT/exec?name=RezaNazari';
+    }
+
+    window.addEventListener('load', () => {
+      registerDevice();
+    });
+  </script>
+  
 <body>
-
- 
-
-  
-  <div class="app-container">
-    <iframe id="gameFrame" src="https://script.google.com/macros/s/AKfycbwgMVf6b-sFWrugXYNcZC96vHlIFjf0KQWdd2spIRuiloMMz6feQppVoEGQ4Mg85ndT/exec?name=RezaNazari"></iframe>
-  </div>
-
-  
 
 </body>
 </html>
