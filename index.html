@@ -23,7 +23,7 @@
       height: 100%;
       margin: 0;
       background-color: #243a4f;
-      overflow: hidden; /* 🔥 Prevents scrollbar */
+      overflow: hidden;
     }
 
     .app-container {
@@ -33,7 +33,6 @@
       bottom: env(safe-area-inset-bottom);
       left: env(safe-area-inset-left);
       background-color: #243a4f;
-
       display: flex;
       flex-direction: column;
       width: 100%;
@@ -45,17 +44,152 @@
       height: 95vh;
       border: none;
       display: block;
-      
     }
   </style>
 </head>
 <body>
 
   <div class="app-container">
-    <iframe src="https://script.google.com/macros/s/AKfycbwgMVf6b-sFWrugXYNcZC96vHlIFjf0KQWdd2spIRuiloMMz6feQppVoEGQ4Mg85ndT/exec?name=RezaNazari"></iframe>
-   </div>
+    <iframe id="gameFrame" src="https://script.google.com/macros/s/AKfycbwgMVf6b-sFWrugXYNcZC96vHlIFjf0KQWdd2spIRuiloMMz6feQppVoEGQ4Mg85ndT/exec?name=RezaNazari"></iframe>
+  </div>
+
+  <script>
+    // ============================================
+    // LOCAL STORAGE MANAGER FOR GAME STATE
+    // ============================================
+    
+    const STORAGE_KEYS = {
+      GAME_STATE: 'mafia_game_state',
+      CONFIG: 'mafia_game_config'
+    };
+
+    // Save game state to localStorage
+    function saveGameToLocal(data) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.GAME_STATE, JSON.stringify(data));
+        console.log('✅ Game saved to local storage');
+        return { success: true };
+      } catch (error) {
+        console.error('❌ Failed to save game:', error);
+        return { success: false, error: error.message };
+      }
+    }
+
+    // Load game state from localStorage
+    function loadGameFromLocal() {
+      try {
+        const data = localStorage.getItem(STORAGE_KEYS.GAME_STATE);
+        if (data) {
+          console.log('✅ Game loaded from local storage');
+          return JSON.parse(data);
+        }
+        console.log('ℹ️ No saved game found');
+        return null;
+      } catch (error) {
+        console.error('❌ Failed to load game:', error);
+        return null;
+      }
+    }
+
+    // Clear game state from localStorage
+    function clearGameFromLocal() {
+      try {
+        localStorage.removeItem(STORAGE_KEYS.GAME_STATE);
+        console.log('✅ Game cleared from local storage');
+        return { success: true };
+      } catch (error) {
+        console.error('❌ Failed to clear game:', error);
+        return { success: false, error: error.message };
+      }
+    }
+
+    // Save config to localStorage
+    function saveConfigToLocal(config) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.CONFIG, JSON.stringify(config));
+        console.log('✅ Config saved to local storage');
+        return { success: true };
+      } catch (error) {
+        console.error('❌ Failed to save config:', error);
+        return { success: false, error: error.message };
+      }
+    }
+
+    // Load config from localStorage
+    function loadConfigFromLocal() {
+      try {
+        const data = localStorage.getItem(STORAGE_KEYS.CONFIG);
+        if (data) {
+          console.log('✅ Config loaded from local storage');
+          return JSON.parse(data);
+        }
+        console.log('ℹ️ No saved config found');
+        return null;
+      } catch (error) {
+        console.error('❌ Failed to load config:', error);
+        return null;
+      }
+    }
+
+    // ============================================
+    // MESSAGE HANDLER FOR IFRAME COMMUNICATION
+    // ============================================
+    
+    window.addEventListener('message', function(event) {
+      // Security: Verify origin if needed
+      // if (event.origin !== 'https://script.google.com') return;
+      
+      const { action, data } = event.data;
+      
+      switch (action) {
+        case 'SAVE_GAME':
+          const saveResult = saveGameToLocal(data);
+          event.source.postMessage({
+            action: 'SAVE_GAME_RESPONSE',
+            success: saveResult.success,
+            error: saveResult.error
+          }, '*');
+          break;
+          
+        case 'LOAD_GAME':
+          const gameData = loadGameFromLocal();
+          event.source.postMessage({
+            action: 'LOAD_GAME_RESPONSE',
+            data: gameData
+          }, '*');
+          break;
+          
+        case 'CLEAR_GAME':
+          const clearResult = clearGameFromLocal();
+          event.source.postMessage({
+            action: 'CLEAR_GAME_RESPONSE',
+            success: clearResult.success
+          }, '*');
+          break;
+          
+        case 'SAVE_CONFIG':
+          const configSaveResult = saveConfigToLocal(data);
+          event.source.postMessage({
+            action: 'SAVE_CONFIG_RESPONSE',
+            success: configSaveResult.success
+          }, '*');
+          break;
+          
+        case 'LOAD_CONFIG':
+          const configData = loadConfigFromLocal();
+          event.source.postMessage({
+            action: 'LOAD_CONFIG_RESPONSE',
+            data: configData
+          }, '*');
+          break;
+      }
+    });
+
+    // Log when iframe is ready
+    document.getElementById('gameFrame').addEventListener('load', function() {
+      console.log('✅ Game iframe loaded');
+    });
+  </script>
 
 </body>
 </html>
-
-
