@@ -136,12 +136,15 @@
     // ============================================
     
     window.addEventListener('message', function(event) {
-      // Security: Verify origin if needed
-      // if (event.origin !== 'https://script.google.com') return;
-      
-      const { action, data } = event.data;
-      
-      switch (action) {
+    const { action, data } = event.data;
+    
+    // Respond to ping
+    if (action === 'PING') {
+        event.source.postMessage({ action: 'PONG' }, '*');
+        return;
+    }
+    
+    switch (action) {
         case 'SAVE_GAME':
           const saveResult = saveGameToLocal(data);
           event.source.postMessage({
@@ -182,8 +185,8 @@
             data: configData
           }, '*');
           break;
-      }
-    });
+    }
+});
 
     // Log when iframe is ready
     document.getElementById('gameFrame').addEventListener('load', function() {
